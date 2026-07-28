@@ -665,30 +665,30 @@ hold on; % Zapobiega nadpisywaniu sceny przez inne elementy graficzne
 
 
 for i = 1:size(bb.x_bb, 2)
-    % 1. Pozycja
+    % 1. Position
     x = bb.x_bb(7,i);
     y = -bb.x_bb(8,i);
     z = -bb.x_bb(9,i);
     
-    % 2. Definicja obrotów (w radianach)
-    yaw = -bb.x_bb(12,i);       % Obrót wokół Z (kierunek lotu)
-    pitch = -bb.x_bb(11,i);            % Obrót wokół Y (pochylenie do przodu)
-    roll = bb.x_bb(10,i); % Obrót wokół X (dynamiczne kołysanie na boki)
+    % 2. Definition of rotations (in radians)
+    yaw = -bb.x_bb(12,i);       % Rotation around Z (flight direction)
+    pitch = -bb.x_bb(11,i);            % Rotation around Y (forward pitch)
+    roll = bb.x_bb(10,i); % Rotation around X (dynamic side-to-side roll)
     
-    % 3. Tworzenie macierzy składowych
+    % 3. Creating component matrices
     T = makehgtform('translate', [x, y, z]);
     Rz = makehgtform('zrotate', yaw);
     Ry = makehgtform('yrotate', pitch);
     Rx = makehgtform('xrotate', roll);
     
-    % 4. Łączenie transformacji (kolejność ma znaczenie!)
-    % Najpierw obracamy wokół własnych osi, potem przesuwamy w przestrzeń
+    % 4. Combining transformations (order matters!)
+    % First we rotate around own axes, then we translate into space
     set(drone_group, 'Matrix', T * Rz * Ry * Rx);
 
     %visualizing the flight data
-     % === ZOPTYMALIZOWANA WIZUALIZACJA ŚCIEŻKI LOTU ===
-    % Zamiast rysować od nowa za pomocą plot3, aktualizujemy tylko dane istniejącej linii.
-    % Poprawiono indeksy: 7->X, 8->Y, 9->Z (wraz z inwersją znaku dla Z tak jak w pozycji)
+     % === OPTIMIZED FLIGHT PATH VISUALIZATION ===
+    % Instead of redrawing from scratch using plot3, we only update the data of the existing line.
+    % Corrected indices: 7->X, 8->Y, 9->Z (along with the sign inversion for Z just like in position)
     set(trail_handle, 'XData', bb.x_bb(7, 1:i), ...
                       'YData', -bb.x_bb(8, 1:i), ...
                       'ZData', -bb.x_bb(9, 1:i));
@@ -696,8 +696,8 @@ for i = 1:size(bb.x_bb, 2)
                       'YData', -bb.xp_bb(8, 1:i), ...
                       'ZData', -bb.xp_bb(9, 1:i));
     
-    az = -45 - i*0.1; % Powolna rotacja kamery w każdym kroku
-    %view(az, 20);
+    az = -45 - i*0.1; % Slow camera rotation at each step
+    view(az, 20);
     drawnow;
     %pause(0.05);
 end
